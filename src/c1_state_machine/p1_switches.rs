@@ -2,7 +2,7 @@
 //! In these examples, we use actually switch boards as the state machine. The state is,
 //! well, just the state of the switches.
 
-use super::StateMachine;
+use super::{p6_open_ended::Transition, StateMachine};
 
 /// This state machine models a single light switch.
 /// The internal state, a bool, represents whether the switch is on or not.
@@ -14,8 +14,12 @@ impl StateMachine for LightSwitch {
     type State = bool;
     type Transition = ();
 
-    fn next_state(starting_state: &bool, t: &()) -> bool {
-        todo!("Exercise 1")
+    fn next_state(starting_state: &bool, _t: &()) -> bool {
+      
+        match starting_state {
+            true => false,
+            false => true,
+        }
     }
 }
 
@@ -31,6 +35,7 @@ pub struct TwoSwitches {
 }
 
 /// Now there are two switches so we need a proper type for the transition.
+#[derive(PartialEq)]
 pub enum Toggle {
     FirstSwitch,
     SecondSwitch,
@@ -42,7 +47,18 @@ impl StateMachine for WeirdSwitchMachine {
     type Transition = Toggle;
 
     fn next_state(starting_state: &TwoSwitches, t: &Toggle) -> TwoSwitches {
-        todo!("Exercise 2")
+        
+        match starting_state {
+            n if n.first_switch==true && n.second_switch==true && t ==&Toggle::FirstSwitch => TwoSwitches{first_switch:false,second_switch:false},
+            n if n.first_switch==true && n.second_switch==false && t ==&Toggle::FirstSwitch => TwoSwitches{first_switch:false,second_switch:false},
+            n if n.first_switch==true && n.second_switch==true && t ==&Toggle::SecondSwitch => TwoSwitches{first_switch:true,second_switch:false},
+            n if n.first_switch==false && n.second_switch==true && t==&Toggle::SecondSwitch=> TwoSwitches{first_switch:false,second_switch:false},
+            n if n.first_switch==false && n.second_switch==false && t==&Toggle::FirstSwitch=> TwoSwitches{first_switch:true,second_switch:false},
+            n if n.first_switch==false && n.second_switch==false && t==&Toggle::SecondSwitch=> TwoSwitches{first_switch:false,second_switch:true},
+            &_ => TwoSwitches{first_switch:starting_state.first_switch,second_switch:starting_state.second_switch},
+
+
+        }
     }
 }
 
