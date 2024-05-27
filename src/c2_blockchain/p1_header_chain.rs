@@ -49,17 +49,16 @@ impl Header {
         let genesis_hash = hash(parent_block);
         let mut check = true; 
         
-
-                 
-        println!("valid child?{}\n",check);
-
         if chain.len()>0{
-            check = genesis_hash ==chain[0].parent; 
+            check = (genesis_hash ==chain[0].parent) && (parent_block.height==chain[0].height-1); 
+           if check==true{
             for i in 0..chain.len()-1 {            
                 let hash0 = hash(&chain[i]);
                 if hash0 == chain[i+1].parent{
                     check=true;
             }
+           }
+            
         }
         }
         
@@ -85,8 +84,7 @@ fn build_valid_chain_length_5() -> Vec<Header> {
         chain.push(child_header); 
     }
 
-    //println!("chain1: {:?}\nchain2: {:?}",chain[1],chain[2]);
-    println!("length:{}",hash(&chain[0])==chain[1].parent);
+
     chain
 
 }
@@ -95,7 +93,23 @@ fn build_valid_chain_length_5() -> Vec<Header> {
 /// The chain should start with a proper genesis header,
 /// but the entire chain should NOT be valid.
 fn build_an_invalid_chain() -> Vec<Header> {
-    todo!("Exercise 5")
+    let mut chain:Vec<Header> = Vec::new();
+    let new_header = Header::genesis();
+    chain.push(new_header.clone());
+    let mut first_child = new_header.child();
+    first_child.parent=hash(&first_child);
+    chain.push(first_child);
+
+    for i in 2..3{
+        let length = chain.len();
+        let parent = hash(&chain[length-1]);
+        let height = chain[length-1].height+1;
+        let child_header = Header{parent,height,..chain[length-1]};
+        chain.push(child_header); 
+    }
+
+
+    chain
 }
 
 // To run these tests: `cargo test bc_1
