@@ -3,6 +3,8 @@
 //! start with that.
 //!
 
+use std::iter;
+
 use crate::hash;
 
 // We will use Rust's built-in hashing where the output type is u64. I'll make an alias
@@ -44,7 +46,23 @@ impl Header {
     /// This method may assume that the block on which it is called is valid, but it
     /// must verify all of the blocks in the slice;
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
-        todo!("Exercise 3")
+        let parent_block = Self::genesis();
+        let genesis_hash = hash(&parent_block);
+        let mut check = true; 
+        
+        for (i,h) in chain.iter().enumerate() {
+            if i==0 {
+                if genesis_hash != h.parent{
+                    check = false;
+                }
+            } else {
+                let hash0 = chain[i-1].parent;
+                if hash0 != h.parent{
+                    check=false;
+                }
+            }
+        }
+        check
     }
 }
 
