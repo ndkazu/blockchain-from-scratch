@@ -45,26 +45,24 @@ impl Header {
     /// This method may assume that the block on which it is called is valid, but it
     /// must verify all of the blocks in the slice;
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
-        let parent_block = Self::genesis();
-        
+        let parent_block = self;
+        let genesis_hash = hash(parent_block);
         let mut check = true; 
         
-        for (i,h) in chain.iter().enumerate() {
-            if i==0 {
-                //Why is this Failing???
-                let genesis_hash = hash(&parent_block);
-                if genesis_hash != h.parent{
-                    check = false;
-                    println!("genesis problem?{}",genesis_hash==h.parent);
-                }
-            } else {
-                let hash0 = hash(&chain[i-1]);
-                if hash0 != h.parent{
-                    check=false;
-                    println!("child problem?");
-                }
+
+                 
+        println!("valid child?{}\n",check);
+
+        if chain.len()>0{
+            check = genesis_hash ==chain[0].parent; 
+            for i in 0..chain.len()-1 {            
+                let hash0 = hash(&chain[i]);
+                if hash0 == chain[i+1].parent{
+                    check=true;
             }
         }
+        }
+        
         check
     }
 }
@@ -77,17 +75,18 @@ fn build_valid_chain_length_5() -> Vec<Header> {
     let new_header = Header::genesis();
     chain.push(new_header.clone());
     let first_child = new_header.child();
-    chain.push(first_child.clone());
+    chain.push(first_child);
 
-    for i in 2..6{
-        let parent = hash(&chain[i-1]);
-        let height = chain[i-1].height+1;
-        let child_header = Header{parent,height,..chain[i-1]};
+    for i in 2..5{
+        let length = chain.len();
+        let parent = hash(&chain[length-1]);
+        let height = chain[length-1].height+1;
+        let child_header = Header{parent,height,..chain[length-1]};
         chain.push(child_header); 
     }
 
     //println!("chain1: {:?}\nchain2: {:?}",chain[1],chain[2]);
-    println!("length is: {}",chain[4].parent==hash(&chain[3]));
+    println!("length:{}",hash(&chain[0])==chain[1].parent);
     chain
 
 }
