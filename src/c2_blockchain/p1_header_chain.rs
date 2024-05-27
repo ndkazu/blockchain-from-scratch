@@ -46,11 +46,13 @@ impl Header {
     /// must verify all of the blocks in the slice;
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
         let parent_block = Self::genesis();
-        let genesis_hash = hash(&parent_block);
+        
         let mut check = true; 
         
         for (i,h) in chain.iter().enumerate() {
             if i==0 {
+                //Why is this Failing???
+                let genesis_hash = hash(&parent_block);
                 if genesis_hash != h.parent{
                     check = false;
                     println!("genesis problem?{}",genesis_hash==h.parent);
