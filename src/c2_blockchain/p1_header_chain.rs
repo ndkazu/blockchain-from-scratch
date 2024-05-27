@@ -29,7 +29,6 @@ impl Header {
     fn genesis() -> Self {
         let height = 0;
         let parent = self::Hash::default();
-        println!("Parent_hash:{}",parent);
         Header{parent,height,extrinsics_root:(),state_root:(),consensus_digest:()}
     }
 
@@ -54,11 +53,13 @@ impl Header {
             if i==0 {
                 if genesis_hash != h.parent{
                     check = false;
+                    println!("genesis problem?{}",genesis_hash==h.parent);
                 }
             } else {
-                let hash0 = chain[i-1].parent;
+                let hash0 = hash(&chain[i-1]);
                 if hash0 != h.parent{
                     check=false;
+                    println!("child problem?");
                 }
             }
         }
@@ -70,7 +71,23 @@ impl Header {
 
 /// Build and return a valid chain with exactly five blocks including the genesis block.
 fn build_valid_chain_length_5() -> Vec<Header> {
-    todo!("Exercise 4")
+    let mut chain:Vec<Header> = Vec::new();
+    let new_header = Header::genesis();
+    chain.push(new_header.clone());
+    let first_child = new_header.child();
+    chain.push(first_child.clone());
+
+    for i in 2..6{
+        let parent = hash(&chain[i-1]);
+        let height = chain[i-1].height+1;
+        let child_header = Header{parent,height,..chain[i-1]};
+        chain.push(child_header); 
+    }
+
+    //println!("chain1: {:?}\nchain2: {:?}",chain[1],chain[2]);
+    println!("length is: {}",chain[4].parent==hash(&chain[3]));
+    chain
+
 }
 
 /// Build and return a chain with at least three headers.
