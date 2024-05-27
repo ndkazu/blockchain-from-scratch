@@ -44,14 +44,89 @@ impl StateMachine for ClothesMachine {
         
         
         match starting_state {
-            n if n== &ClothesState::Clean(x) && t == &ClothesAction::Wear => {
-                let new_life = x-1;
-                if new_life==0 { 
-                    return ClothesState::Tattered}else{
-                        return ClothesState::Dirty(new_life);
+            
+            &ClothesState::Clean(x) => {
+                match t {
+                    
+                    &ClothesAction::Wash => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Wet(new_life);
+                            }
+                    },
+                    &ClothesAction::Dry => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Clean(new_life);
+                            }
+                    },
+                    &ClothesAction::Wear => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Dirty(new_life);
+                            }
                     }
-                    }, 
-            n if n== &ClothesState::Dirty(x) && t == &ClothesAction::Wash => ClothesState::Wet(x-1), 
+                }
+               
+            },
+            &ClothesState::Dirty(x) => {
+                match t {
+                    
+                    &ClothesAction::Wash => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Wet(new_life);
+                            }
+                    },
+                    &ClothesAction::Dry => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Dirty(new_life);
+                            }
+                    },
+                    &ClothesAction::Wear => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Dirty(new_life);
+                            }
+                    }
+                }
+            },
+            &ClothesState::Wet(x)=>{
+                match t {
+                    
+                    &ClothesAction::Wash => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Wet(new_life);
+                            }
+                    },
+                    &ClothesAction::Dry => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Clean(new_life);
+                            }
+                    },
+                    &ClothesAction::Wear => {
+                        let new_life = x-1;
+                        if new_life==0 { 
+                            return ClothesState::Tattered }else{
+                                return ClothesState::Dirty(new_life);
+                            }
+                    }
+                }
+            }
+
+            &ClothesState::Tattered => ClothesState::Tattered
+
         }
     }
 }
