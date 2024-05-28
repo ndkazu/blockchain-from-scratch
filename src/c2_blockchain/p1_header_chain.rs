@@ -51,12 +51,19 @@ impl Header {
         
         if chain.len()>0{
             check = (genesis_hash ==chain[0].parent) && (parent_block.height==chain[0].height-1); 
+          
            if check==true{
-            for i in 0..chain.len()-1 {            
+
+            //return chain[0].verify_sub_chain(chain[1..])
+
+            for i in 0..chain.len()-2 {            
                 let hash0 = hash(&chain[i]);
                 if hash0 == chain[i+1].parent{
                     check=true;
-            }
+            } else {
+                check=false;
+                break
+            } 
            }
             
         }

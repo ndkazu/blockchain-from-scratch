@@ -58,7 +58,27 @@ impl Header {
     /// So in order for a block to verify, we must have that relationship between the extrinsic,
     /// the previous state, and the current state.
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
-        todo!("Exercise 3")
+        let parent_block = self;
+        let genesis_hash = hash(parent_block);
+        let mut check = true;
+        let state = parent_block.state + chain[0].extrinsic;
+        if chain.len()>0{
+            check = (genesis_hash ==chain[0].parent) 
+            && (parent_block.height==chain[0].height-1)
+            && (chain[0].state == state);
+
+            if check == true{
+                for i in 0..chain.len() -1 {
+                    let hash0 = hash(&chain[i]);
+                    if hash0 == chain[i+1].parent {
+                        check=true;
+                    }else{
+                        check=false;
+                    }
+                }
+            }
+        }
+     check   
     }
 }
 
