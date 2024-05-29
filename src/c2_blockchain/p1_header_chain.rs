@@ -58,7 +58,8 @@ impl Header {
 
             for i in 0..chain.len()-2 {            
                 let hash0 = hash(&chain[i]);
-                if hash0 == chain[i+1].parent{
+                if hash0 == chain[i+1].parent 
+                && chain[i].height == chain[i+1].height-1{
                     check=true;
             } else {
                 check=false;

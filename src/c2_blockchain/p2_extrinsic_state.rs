@@ -42,10 +42,9 @@ impl Header {
     /// Create and return a valid child header.
     fn child(&self, extrinsic: u64) -> Self {
         let parent_header = Self::genesis();
-        let parent = parent_header.parent;
+        let parent = hash(&parent_header);
         let height = parent_header.height+1;
-        let extrinsic = 7;
-        let state = 7;
+        let state = extrinsic+parent_header.state;
         Header { parent, height, extrinsic, state, consensus_digest: () }
     }
 
@@ -61,16 +60,24 @@ impl Header {
         let parent_block = self;
         let genesis_hash = hash(parent_block);
         let mut check = true;
-        let state = parent_block.state + chain[0].extrinsic;
+        
+        
         if chain.len()>0{
-            check = (genesis_hash ==chain[0].parent) 
+            println!("c0 is :{}",chain[0].state == chain[0].extrinsic);
+        check = (genesis_hash ==chain[0].parent) 
             && (parent_block.height==chain[0].height-1)
-            && (chain[0].state == state);
+            && (chain[0].state == chain[0].extrinsic);   
+                     
 
             if check == true{
-                for i in 0..chain.len() -1 {
+                for i in 0..chain.len() -2 {
                     let hash0 = hash(&chain[i]);
-                    if hash0 == chain[i+1].parent {
+                    println!("the {}th element state is correct? {}",i,chain[i].state+chain[i+1].extrinsic==chain[i+1].state);
+
+                    if hash0 == chain[i+1].parent 
+                    && chain[i].height == chain[i+1].height-1
+                    && chain[i].state+chain[i+1].extrinsic==chain[i+1].state
+                     {
                         check=true;
                     }else{
                         check=false;
