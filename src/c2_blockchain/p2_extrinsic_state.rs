@@ -41,7 +41,7 @@ impl Header {
 
     /// Create and return a valid child header.
     fn child(&self, extrinsic: u64) -> Self {
-        let parent_header = Self::genesis();
+        let parent_header = self;
         let parent = hash(&parent_header);
         let height = parent_header.height+1;
         let state = extrinsic+parent_header.state;
@@ -59,31 +59,19 @@ impl Header {
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
         let parent_block = self;
         let genesis_hash = hash(parent_block);
-        let mut check = true;
-        
-        
+        let mut check = true;        
+        println!("Chain length:{}",chain.len());
         if chain.len()>0{
-            println!("c0 is :{}",chain[0].state == chain[0].extrinsic);
+            println!("Entering IF");
         check = (genesis_hash ==chain[0].parent) 
             && (parent_block.height==chain[0].height-1)
-            && (chain[0].state == chain[0].extrinsic);   
+            && (chain[0].state == chain[0].extrinsic+ parent_block.state);
+
+            for i in 0..chain.len()-2{
+                return chain[i].verify_sub_chain(&chain[i+1..])
+            }
                      
 
-            if check == true{
-                for i in 0..chain.len() -2 {
-                    let hash0 = hash(&chain[i]);
-                    println!("the {}th element state is correct? {}",i,chain[i].state+chain[i+1].extrinsic==chain[i+1].state);
-
-                    if hash0 == chain[i+1].parent 
-                    && chain[i].height == chain[i+1].height-1
-                    && chain[i].state+chain[i+1].extrinsic==chain[i+1].state
-                     {
-                        check=true;
-                    }else{
-                        check=false;
-                    }
-                }
-            }
         }
      check   
     }
