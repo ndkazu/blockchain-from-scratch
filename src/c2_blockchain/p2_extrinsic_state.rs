@@ -62,7 +62,6 @@ impl Header {
         let parent_block = self;
         let parent_hash = hash(parent_block);
         let mut check = true;        
-        println!("Chain length:{}",chain.len());
         if chain.len()>0{
         check = (parent_hash ==chain[0].parent) 
             && (parent_block.height==chain[0].height-1)
@@ -90,6 +89,7 @@ fn build_valid_chain(n: u64) -> Vec<Header> {
     let genesis = Header::genesis();
     chain.push(genesis.clone());
     let first_child = genesis.child(1);
+    chain.push(first_child);
     
     for i in 2..n as usize{
         let extrinsic = chain[i-1].extrinsic;
@@ -142,7 +142,23 @@ fn build_an_invalid_chain() -> Vec<Header> {
 ///
 /// Side question: What is the fewest number of headers you could create to achieve this goal.
 fn build_forked_chain() -> (Vec<Header>, Vec<Header>) {
-    todo!("Exercise 6")
+    //First build a linear chain: Genesis + 4 bocks
+     let initial_chain = self::build_valid_chain(5);
+     //build chain from block2. add 2 children
+     
+    let mut forked_chain = vec![initial_chain[2].clone()];
+    for i in 0..2{
+        let child = forked_chain[i].child(4+ i as u64);
+        forked_chain.push(child);
+    }
+    let initial = initial_chain[0..2].to_vec();
+    let final_fork:Vec<Header> = vec![initial,forked_chain].concat();
+    //println!("length of fork_chain: {}",final_fork.len());
+    //println!("we have a problem:{}",initial_chain[2]==final_fork[0]);
+
+
+     (initial_chain,final_fork)
+
 
     // Exercise 7: After you have completed this task, look at how its test is written below.
     // There is a critical thinking question for you there.
