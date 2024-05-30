@@ -7,6 +7,8 @@
 //! In the coming parts of this tutorial, we will expand this to be more real-world like and
 //! use some real batching.
 
+use std::process::Child;
+
 use crate::hash;
 
 // We will use Rust's built-in hashing where the output type is u64. I'll make an alias
@@ -58,19 +60,21 @@ impl Header {
     /// the previous state, and the current state.
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
         let parent_block = self;
-        let genesis_hash = hash(parent_block);
+        let parent_hash = hash(parent_block);
         let mut check = true;        
         println!("Chain length:{}",chain.len());
         if chain.len()>0{
-            println!("Entering IF");
-        check = (genesis_hash ==chain[0].parent) 
+        check = (parent_hash ==chain[0].parent) 
             && (parent_block.height==chain[0].height-1)
             && (chain[0].state == chain[0].extrinsic+ parent_block.state);
+    if check==true{
+        for i in 0..chain.len()-2{
+            return chain[i].verify_sub_chain(&chain[i+1..])
+        }
+            
+    }
 
-            for i in 0..chain.len()-2{
-                return chain[i].verify_sub_chain(&chain[i+1..])
-            }
-                     
+             
 
         }
      check   
@@ -81,7 +85,20 @@ impl Header {
 
 /// Build and return a valid chain with the given number of blocks.
 fn build_valid_chain(n: u64) -> Vec<Header> {
-    todo!("Exercise 4")
+    //First, chain container, genesis block, and first child block
+    let mut chain:Vec<Header> = Vec::new();
+    let genesis = Header::genesis();
+    chain.push(genesis.clone());
+    let first_child = genesis.child(1);
+    
+    for i in 2..n as usize{
+        let extrinsic = chain[i-1].extrinsic;
+        let child = chain[i-1].child(extrinsic+1);
+        chain.push(child);
+    }
+
+    chain
+
 }
 
 /// Build and return a chain with at least three headers.
@@ -95,7 +112,22 @@ fn build_valid_chain(n: u64) -> Vec<Header> {
 /// For this function, ONLY USE the the `genesis()` and `child()` methods to create blocks.
 /// The exercise is still possible.
 fn build_an_invalid_chain() -> Vec<Header> {
-    todo!("Exercise 5")
+    //First, chain container, genesis block, and first child block
+    let mut chain:Vec<Header> = Vec::new();
+    let genesis = Header::genesis();
+    chain.push(genesis.clone());
+    let mut first_child = genesis.child(1);
+    first_child.parent= 10;
+    first_child.height = 10;
+    chain.push(first_child);
+     let size = 5 as usize;
+    for i in 2..size{
+        let extrinsic = chain[i-1].extrinsic;
+        let child = chain[i-1].child(extrinsic+1);
+        chain.push(child);
+    }
+
+    chain
 }
 
 /// Build and return two header chains.
